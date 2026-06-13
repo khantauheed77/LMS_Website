@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { assets } from "../../assets/assets";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useClerk, UserButton, useUser } from "@clerk/react";
+import { useClerk, UserButton, useUser } from "@clerk/clerk-react";
 import AppContext from "../../context/AppContext";
 
 const Navbar = () => {

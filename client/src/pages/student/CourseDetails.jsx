@@ -6,6 +6,8 @@ import Loading from "../student/Loading";
 import humanizeDuration from "humanize-duration";
 import Footer from "../../components/educator/Footer";
 import Youtube from "react-youtube"
+import axios from "axios";
+import { useAuth } from "@clerk/clerk-react";
 const CourseDetails = () => {
   const { id } = useParams();
   const [courseData, setCourseData] = useState(null);
@@ -20,7 +22,26 @@ const CourseDetails = () => {
     currency,
     calculateNoOfLectures,
   } = useContext(AppContext);
+  const { getToken } = useAuth();
+
+  const enrollCourse = async () => {
+      try {
+        const token = await getToken();
+        const { data } = await axios.post(
+          import.meta.env.VITE_BACKEND_URL + '/api/user/purchase',
+          { courseId: courseData._id },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (data.success) {
+          window.location.replace(data.session_url);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
   const rating = courseData ? calculateRating(courseData) : 0;
+
   const fetchCourseData = () => {
     const findCourses = allCourses.find((course) => course._id === id);
     setCourseData(findCourses);
@@ -207,7 +228,7 @@ const CourseDetails = () => {
                 <p>{calculateNoOfLectures(courseData)} lessons</p>
               </div>
             </div>
-            <button className="md:mt-6 mt-4 w-full py-3 rounded bg-blue-600 text-white font-medium">
+            <button onClick={enrollCourse} className="md:mt-6 mt-4 w-full py-3 rounded bg-blue-600 text-white font-medium">
               {isAlreadyEnrolled ? "Already Enrolled" : "Enroll Now"}
             </button>
             <div className="pt-6">

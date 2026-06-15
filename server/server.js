@@ -14,11 +14,8 @@ import courseRouter from "./routes/courseRoutes.js";
 
 const app = express();
 
-//Connecting to MongoDB
-await connectDB();
-
-//connecting to cloudinary
-await connectCloudinary();
+connectDB();
+connectCloudinary();
 //MiddleWare
 app.use(cors());
 app.use(clerkMiddleware());

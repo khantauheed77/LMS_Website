@@ -3,6 +3,7 @@ import User from "../models/users.js";
 import Stripe from "stripe";
 import purchase from "../models/purchase.js";
 import Course from "../models/course.js";
+import connectDB from "../configs/mongodb.js";
 
 //API Controller Function to Manage Clerk User with Database
 
@@ -53,6 +54,7 @@ export const clerkWebhooks = async (req, res) => {
 };
 
 export const stripeWebhooks = async (req, res) => {
+  await connectDB();
   const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
   const sig = req.headers["stripe-signature"];
 

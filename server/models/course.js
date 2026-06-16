@@ -25,10 +25,10 @@ const courseSchema = new mongoose.Schema({
     courseContent : [chapterSchema],
     courseRatings : [{userId : {type : String}, rating : {type : Number, min :1 , max : 5}}],
     educator : {type : String , ref : 'User' , required : true},
-    enrolledStudents : {
+    enrolledStudents : [{
         type : String ,
         ref : 'User'
-    },
+    }],
 
 },{timestamps : true,minimize : false})
 

@@ -87,9 +87,12 @@ export const stripeWebhooks = async (req, res) => {
 
         const purchaseData = await Purchase.findById(purchaseId);
         if (!purchaseData) throw new Error("Purchase not found");
+        console.log("purchaseData:", purchaseData);
 
         const userData = await User.findById(purchaseData.userId);
         const courseData = await Course.findById(purchaseData.courseId);
+        console.log("userData:", userData?._id);
+        console.log("courseData:", courseData?._id);
 
         if (!userData || !courseData) throw new Error("User or Course not found");
 

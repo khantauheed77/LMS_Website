@@ -81,29 +81,17 @@ export const stripeWebhooks = async (req, res) => {
 
   try {
     switch (event.type) {
-      case "payment_intent.succeeded": {
-        const paymentIntent = event.data.object;
-        const paymentIntentId = paymentIntent.id;
-
-        const session = await stripeInstance.checkout.sessions.list({
-          payment_intent: paymentIntentId,
-        });
-        const { purchaseId } = session.data[0].metadata;
+      case "checkout.session.completed": {
+        const session = event.data.object;
+        const { purchaseId } = session.metadata;
 
         const purchaseData = await Purchase.findById(purchaseId);
-
-        if (!purchaseData) {
-          throw new Error("Purchase not found");
-        }
+        if (!purchaseData) throw new Error("Purchase not found");
 
         const userData = await User.findById(purchaseData.userId);
-        const courseData = await Course.findById(
-          purchaseData.courseId
-        );
+        const courseData = await Course.findById(purchaseData.courseId);
 
-        if (!userData || !courseData) {
-          throw new Error("User or Course not found");
-        }
+        if (!userData || !courseData) throw new Error("User or Course not found");
 
         courseData.enrolledStudents.push(userData._id);
         await courseData.save();
@@ -116,19 +104,14 @@ export const stripeWebhooks = async (req, res) => {
 
         break;
       }
-      case 'payment_intent.payment_failed':{
-        const paymentIntent = event.data.object;
-        const paymentIntentId = paymentIntent.id;
-
-        const session = await stripeInstance.checkout.sessions.list({
-          payment_intent: paymentIntentId,
-        });
-
-        const { purchaseId } = session.data[0].metadata;
+      case "checkout.session.expired": {
+        const session = event.data.object;
+        const { purchaseId } = session.metadata;
         const purchaseData = await Purchase.findById(purchaseId);
-        purchaseData.status = "failed";
-        await purchaseData.save();
-
+        if (purchaseData) {
+          purchaseData.status = "failed";
+          await purchaseData.save();
+        }
         break;
       }
         
